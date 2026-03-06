@@ -12,7 +12,16 @@ const app = express();
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 /* ================= CORS FIX ================= */
+const cors = require("cors")
 
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://campus4.netlify.app",
+    "https://camp-rjlh1ujms-camp-us.vercel.app"
+  ],
+  credentials: true
+}))
 app.use((req, res, next) => {
 
   res.header("Access-Control-Allow-Origin", "*");
