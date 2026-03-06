@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import API from "../api";
-
 function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [name, setName] = useState("");
