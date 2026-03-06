@@ -1,3 +1,2 @@
-const API = "https://camp-us-pum6g7v9s-nirmitds-projects.vercel.app";
-
+const API = "https://camp-rjlh1ujms-camp-us.vercel.app/";
 export default API;
