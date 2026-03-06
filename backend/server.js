@@ -9,47 +9,33 @@ const Request = require("./models/Request");
 const { verifyToken, checkRole } = require("./middleware/auth");
 
 const app = express();
-
-/* ================= CORS ================= */
-
-const cors = require("cors");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
-app.use(
-  cors({
-    origin: [
-      "https://campus4.netlify.app",
-    ],
-    methods: ["GET","POST","PUT","DELETE"],
-    credentials: true
-  })
-);
-
-app.use(express.json());
+/* ================= CORS FIX ================= */
 
 app.use((req, res, next) => {
 
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://campus4.netlify.app"
-  );
+  res.header("Access-Control-Allow-Origin", "*");
 
-  res.setHeader(
+  res.header(
     "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
+    "POST, GET, OPTIONS, PUT, DELETE"
   );
 
-  res.setHeader(
+  res.header(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization"
+    "Content-Type, X-Auth-Token, Origin, Authorization"
   );
 
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    return res.sendStatus(200);
   }
 
   next();
+
 });
+
+app.use(express.json());
 
 /* ================= DATABASE ================= */
 
@@ -57,16 +43,9 @@ mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));
 
-/* ================= HEALTH CHECK ================= */
-
-app.get("/", (req, res) => {
-  res.send({
-    activeStatus: true,
-    error: false
-  });
-});
-
 /* ================= AUTH ROUTES ================= */
+
+/* ===== REGISTER ===== */
 
 app.post("/auth/register", async (req, res) => {
 
@@ -78,8 +57,11 @@ app.post("/auth/register", async (req, res) => {
       $or: [{ email }, { username }]
     });
 
-    if (existing)
-      return res.status(400).json({ message: "User already exists" });
+    if (existing) {
+      return res.status(400).json({
+        message: "User already exists"
+      });
+    }
 
     const user = await User.create({
       name,
@@ -97,7 +79,7 @@ app.post("/auth/register", async (req, res) => {
 
   } catch (err) {
 
-    console.log("REGISTER ERROR:", err);
+    console.log(err);
 
     res.status(500).json({
       message: "Server error"
@@ -107,6 +89,7 @@ app.post("/auth/register", async (req, res) => {
 
 });
 
+/* ===== LOGIN ===== */
 
 app.post("/auth/login", async (req, res) => {
 
@@ -116,16 +99,20 @@ app.post("/auth/login", async (req, res) => {
 
     const user = await User.findOne({
       $or: [
-        { username: username },
+        { username },
         { email: username }
       ]
     });
 
     if (!user)
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({
+        message: "User not found"
+      });
 
     if (user.password !== password)
-      return res.status(401).json({ message: "Invalid password" });
+      return res.status(401).json({
+        message: "Invalid password"
+      });
 
     const token = jwt.sign(
       {
@@ -138,10 +125,7 @@ app.post("/auth/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({
-      token,
-      user
-    });
+    res.json({ token, user });
 
   } catch (err) {
 
@@ -156,6 +140,8 @@ app.post("/auth/login", async (req, res) => {
 });
 
 /* ================= EXCHANGE ROUTES ================= */
+
+/* ===== CREATE ===== */
 
 app.post("/exchange/create", verifyToken, async (req, res) => {
 
@@ -177,14 +163,17 @@ app.post("/exchange/create", verifyToken, async (req, res) => {
 
   } catch (err) {
 
-    console.log("CREATE ERROR:", err);
+    console.log(err);
 
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: "Server error"
+    });
 
   }
 
 });
 
+/* ===== GET ALL ===== */
 
 app.get("/exchange/all", async (req, res) => {
 
@@ -197,14 +186,17 @@ app.get("/exchange/all", async (req, res) => {
 
   } catch (err) {
 
-    console.log("FETCH ERROR:", err);
+    console.log(err);
 
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: "Server error"
+    });
 
   }
 
 });
 
+/* ===== ACCEPT ===== */
 
 app.put("/exchange/accept/:id", verifyToken, async (req, res) => {
 
@@ -213,10 +205,14 @@ app.put("/exchange/accept/:id", verifyToken, async (req, res) => {
     const request = await Request.findById(req.params.id);
 
     if (!request)
-      return res.status(404).json({ message: "Request not found" });
+      return res.status(404).json({
+        message: "Request not found"
+      });
 
     if (request.ownerUsername === req.user.username)
-      return res.status(400).json({ message: "Cannot accept your own request" });
+      return res.status(400).json({
+        message: "Cannot accept your own request"
+      });
 
     request.status = "Accepted";
     request.acceptedBy = req.user.username;
@@ -227,14 +223,17 @@ app.put("/exchange/accept/:id", verifyToken, async (req, res) => {
 
   } catch (err) {
 
-    console.log("ACCEPT ERROR:", err);
+    console.log(err);
 
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: "Server error"
+    });
 
   }
 
 });
 
+/* ===== DELETE ===== */
 
 app.delete("/exchange/:id", verifyToken, async (req, res) => {
 
@@ -243,25 +242,34 @@ app.delete("/exchange/:id", verifyToken, async (req, res) => {
     const request = await Request.findById(req.params.id);
 
     if (!request)
-      return res.status(404).json({ message: "Request not found" });
+      return res.status(404).json({
+        message: "Request not found"
+      });
 
     if (request.ownerUsername !== req.user.username)
-      return res.status(403).json({ message: "Not allowed" });
+      return res.status(403).json({
+        message: "Not allowed"
+      });
 
     await Request.findByIdAndDelete(req.params.id);
 
-    res.json({ message: "Request deleted" });
+    res.json({
+      message: "Request deleted"
+    });
 
   } catch (err) {
 
-    console.log("DELETE ERROR:", err);
+    console.log(err);
 
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: "Server error"
+    });
 
   }
 
 });
 
+/* ===== MY REQUESTS ===== */
 
 app.get("/exchange/my-requests", verifyToken, async (req, res) => {
 
@@ -275,15 +283,17 @@ app.get("/exchange/my-requests", verifyToken, async (req, res) => {
 
   } catch (err) {
 
-    console.log("MY REQUEST ERROR:", err);
+    console.log(err);
 
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: "Server error"
+    });
 
   }
 
 });
 
-/* ================= ADMIN ================= */
+/* ================= ADMIN ROUTES ================= */
 
 app.get(
   "/admin/users",
@@ -294,18 +304,32 @@ app.get(
     try {
 
       const users = await User.find();
+
       res.json(users);
 
     } catch (err) {
 
-      console.log("ADMIN ERROR:", err);
+      console.log(err);
 
-      res.status(500).json({ message: "Server error" });
+      res.status(500).json({
+        message: "Server error"
+      });
 
     }
 
   }
 );
+
+/* ================= HEALTH CHECK ================= */
+
+app.get("/", (req, res) => {
+
+  res.send({
+    activeStatus: true,
+    error: false
+  });
+
+});
 
 /* ================= SERVER ================= */
 
