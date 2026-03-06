@@ -3,6 +3,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/campus.png";
+import API from "../api";
 
 function Auth() {
 
@@ -32,7 +33,7 @@ function Auth() {
 
     try {
 
-      const res = await axios.post(`https://camp-rjlh1ujms-camp-us.vercel.app/auth/login`,{
+      const res = await axios.post(`${API}/auth/login`,{
         username,
         password
       });
@@ -58,7 +59,7 @@ function Auth() {
 
     try {
 
-      await axios.post(`https://camp-rjlh1ujms-camp-us.vercel.app/auth/register`, {
+      await axios.post(`${API}/auth/register`, {
         name,
         email,
         username,
