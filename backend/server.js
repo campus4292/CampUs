@@ -18,7 +18,7 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
 app.use(
   cors({
     origin: [
-      "https://campus40.netlify.app",
+      "https://roaring-biscuit-439aca.netlify.app",
     ],
     methods: ["GET","POST","PUT","DELETE"],
     credentials: true
