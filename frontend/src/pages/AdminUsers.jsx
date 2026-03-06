@@ -17,7 +17,7 @@ function AdminUsers() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`${API}/admin/users`, {
+      const res = await axios.get(`${API}admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -44,7 +44,7 @@ function AdminUsers() {
     try {
 
       await axios.post(
-        `${API}/admin/users`,
+        `${API}admin/users`,
         { name, email, password, role },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -68,7 +68,7 @@ function AdminUsers() {
     try {
 
       await axios.put(
-        `${API}/admin/users/${id}`,
+        `${API}admin/users/${id}`,
         { role },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -87,7 +87,7 @@ function AdminUsers() {
     try {
 
       await axios.delete(
-        `${API}/admin/users/${id}`,
+        `${API}admin/users/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

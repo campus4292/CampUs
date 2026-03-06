@@ -33,7 +33,7 @@ function Auth() {
 
     try {
 
-      const res = await axios.post(`${API}/auth/login`,{
+      const res = await axios.post(`${API}auth/login`,{
         username,
         password
       });
@@ -59,7 +59,7 @@ function Auth() {
 
     try {
 
-      await axios.post(`${API}/auth/register`, {
+      await axios.post(`${API}auth/register`, {
         name,
         email,
         username,

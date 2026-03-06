@@ -9,7 +9,7 @@ function Register() {
 
   const handleRegister = async () => {
     try {
-      await axios.post(`${API}/auth/register`, {
+      await axios.post(`${API}auth/register`, {
         name,
         username,
         email,
