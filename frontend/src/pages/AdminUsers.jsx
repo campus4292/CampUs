@@ -11,7 +11,7 @@ function AdminUsers() {
   const token = localStorage.getItem("token");
 
   const fetchUsers = async () => {
-    const res = await axios.get(`${API}/admin/users`, {
+    const res = await axios.get(`https://camp-rjlh1ujms-camp-us.vercel.app/admin/users`, {
       headers: { authorization: token },
     });
     setUsers(res.data);
@@ -24,7 +24,7 @@ function AdminUsers() {
   const addUser = async () => {
     if (!name || !email) return;
 
-    await axios.post(`${API}/admin/users`,
+    await axios.post(`https://camp-rjlh1ujms-camp-us.vercel.app/admin/users`,
       { name, email, role },
       { headers: { authorization: token } }
     );
@@ -38,7 +38,7 @@ function AdminUsers() {
 
   const updateRole = async (id, role) => {
     await axios.put(
-      `http://localhost:5000/admin/users/${id}`,
+      `https://camp-rjlh1ujms-camp-us.vercel.app/admin/users/${id}`,
       { role },
       { headers: { authorization: token } }
     );
@@ -47,7 +47,7 @@ function AdminUsers() {
 
   const deleteUser = async (id) => {
     await axios.delete(
-      `http://localhost:5000/admin/users/${id}`,
+      `https://camp-rjlh1ujms-camp-us.vercel.app/admin/users/${id}`,
       { headers: { authorization: token } }
     );
     fetchUsers();
