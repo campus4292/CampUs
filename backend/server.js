@@ -3,46 +3,23 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const cors = require("cors")
 
 const User = require("./models/User");
 const Request = require("./models/Request");
 const { verifyToken, checkRole } = require("./middleware/auth");
 
 const app = express();
-const dns = require("dns");
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
-/* ================= CORS FIX ================= */
-const cors = require("cors")
 
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://campus4.netlify.app",
-    "https://camp-rjlh1ujms-camp-us.vercel.app"
+    "https://campus4.netlify.app"
   ],
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"],
   credentials: true
 }))
-app.use((req, res, next) => {
-
-  res.header("Access-Control-Allow-Origin", "*");
-
-  res.header(
-    "Access-Control-Allow-Methods",
-    "POST, GET, OPTIONS, PUT, DELETE"
-  );
-
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type, X-Auth-Token, Origin, Authorization"
-  );
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
-  next();
-
-});
 
 app.use(express.json());
 
