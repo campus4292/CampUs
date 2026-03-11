@@ -20,7 +20,8 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://campus4.netlify.app"
+    "https://campus4.netlify.app",
+    "https://camp-ngv8u0c72-camp-us.vercel.app/"
   ],
   methods: ["GET","POST","PUT","DELETE","OPTIONS"],
   allowedHeaders: ["Content-Type","Authorization"],
