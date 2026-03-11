@@ -1,15 +1,21 @@
+
 require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const cors = require("cors")
+const cors = require("cors");
 
 const User = require("./models/User");
 const Request = require("./models/Request");
 const { verifyToken, checkRole } = require("./middleware/auth");
 
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "4.4.4.4"]);
+
 const app = express();
+
+/* ================= CORS ================= */
 
 app.use(cors({
   origin: [
@@ -19,19 +25,23 @@ app.use(cors({
   methods: ["GET","POST","PUT","DELETE","OPTIONS"],
   allowedHeaders: ["Content-Type","Authorization"],
   credentials: true
-}))
+}));
 
 app.use(express.json());
 
 /* ================= DATABASE ================= */
 
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+.then(() => {
+  console.log("✅ MongoDB Connected");
+})
+.catch((err) => {
+  console.error("❌ MongoDB Connection Error:");
+  console.error(err);
+  process.exit(1);
+});
 
 /* ================= AUTH ROUTES ================= */
-
-/* ===== REGISTER ===== */
 
 app.post("/auth/register", async (req, res) => {
 
@@ -126,8 +136,6 @@ app.post("/auth/login", async (req, res) => {
 });
 
 /* ================= EXCHANGE ROUTES ================= */
-
-/* ===== CREATE ===== */
 
 app.post("/exchange/create", verifyToken, async (req, res) => {
 
@@ -322,5 +330,5 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
